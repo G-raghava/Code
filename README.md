@@ -1,2 +1,1 @@
-pip install PyMuPDF
-pip install streamlit
+pip install -r requirements.txt
