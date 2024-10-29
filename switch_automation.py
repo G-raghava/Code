@@ -73,6 +73,7 @@ api_key = "9ZvOUXcI5494YBCOVBKcsa3LRZ9sT3ho466qJs7h"
 # File upload option
 uploaded_file = st.file_uploader("Upload a file (optional)", type=["txt", "json", "py", "pdf"])
 
+file_content = None
 if uploaded_file is not None:
     if uploaded_file.type == "application/pdf":
         file_content = extract_text_from_pdf(uploaded_file)  # Use fitz to extract text from PDF
