@@ -57,7 +57,7 @@ st.title("Chatbot for Switch Automation")
 st.write("Select the database, enter a question,  and get a response from the API.")
 
 api_url = "https://bfhirdl9h5.execute-api.us-west-2.amazonaws.com/dev/switchAutomation/"
-api_key = "9ZvOUXcI5494YBCOVBKcsa3LRZ9sT3ho466qJs7h"  # Replace with environment variable for security
+api_key = "9ZvOUXcI5494YBCOVBKcsa3LRZ9sT3ho466qJs7h"  
 
 # File upload option
 uploaded_file = st.file_uploader("Upload a file (optional)", type=["txt", "json", "py"])
@@ -75,8 +75,7 @@ test_type_choice = st.selectbox(
     index=0  # default to "halon_test"
 )
 
-# Submit button to process the question
-#if st.button("Submit Question"):
+
 if question_raw:
     #with st.chat_message("user"):
         #st.write(question_raw)
