@@ -11,11 +11,14 @@ def preprocess_question(question):
     return question.strip()
 
 # Function to access API
-def access_api(url, question, test_type, api_key):
+def access_api(url, question, test_type, api_key, file_content=None):
     payload = {
         "question": question,
         "test_type": test_type
     }
+    if file_content:
+        payload["file_content"] = file_content 
+    
     headers = {
         'Content-Type': 'application/json',
         'x-api-key': api_key
@@ -56,15 +59,13 @@ st.write("Select the database, enter a question,  and get a response from the AP
 api_url = "https://bfhirdl9h5.execute-api.us-west-2.amazonaws.com/dev/switchAutomation/"
 api_key = "9ZvOUXcI5494YBCOVBKcsa3LRZ9sT3ho466qJs7h"  # Replace with environment variable for security
 
-# File upload
-#uploaded_file = st.file_uploader("Upload a file (optional)", type=["txt", "csv", "json", "py"])
+# File upload option
+uploaded_file = st.file_uploader("Upload a file (optional)", type=["txt", "json", "py"])
 
-# if uploaded_file is not None:
-#     # Process file contents based on type, e.g., read a text, CSV, JSON, or Python file
-#     file_content = uploaded_file.read()
-#     st.write("Uploaded file content:")
-#     st.write(file_content.decode("utf-8"))
-
+file_content = None
+if uploaded_file is not None:
+    # Read the file content as a string
+    file_content = uploaded_file.read().decode("utf-8")
 
 # Input fields for question and test type selection
 question_raw = st.chat_input("Enter your question:")
@@ -80,7 +81,7 @@ if question_raw:
     #with st.chat_message("user"):
         #st.write(question_raw)
     question = preprocess_question(question_raw)
-    answer, source_urls, session_id = access_api(api_url, question, test_type_choice, api_key)
+    answer, source_urls, session_id = access_api(api_url, question, test_type_choice, api_key, file_content)
     
     st.session_state.chat_history.append({"user": question_raw, "assistant": answer or "No answer found", "source_urls": source_urls})
 
