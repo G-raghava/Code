@@ -2,6 +2,17 @@ import streamlit as st
 import requests
 import json
 import re
+import fitz  # PyMuPDF
+
+# Extract text from PDF file using fitz (PyMuPDF)
+def extract_text_from_pdf(pdf_file):
+    text = ""
+    with fitz.open(stream=pdf_file.read(), filetype="pdf") as pdf:
+        for page_num in range(len(pdf)):
+            page = pdf[page_num]
+            text += page.get_text()  # Extract text from each page
+    return text
+
 
 # Preprocess question to remove unwanted characters and extra spaces
 def preprocess_question(question):
@@ -60,12 +71,14 @@ api_url = "https://bfhirdl9h5.execute-api.us-west-2.amazonaws.com/dev/switchAuto
 api_key = "9ZvOUXcI5494YBCOVBKcsa3LRZ9sT3ho466qJs7h"  
 
 # File upload option
-uploaded_file = st.file_uploader("Upload a file (optional)", type=["txt", "json", "py"])
+uploaded_file = st.file_uploader("Upload a file (optional)", type=["txt", "json", "py", "pdf"])
 
-file_content = None
 if uploaded_file is not None:
-    # Read the file content as a string
-    file_content = uploaded_file.read().decode("utf-8")
+    if uploaded_file.type == "application/pdf":
+        file_content = extract_text_from_pdf(uploaded_file)  # Use fitz to extract text from PDF
+    else:
+        file_content = uploaded_file.read().decode("utf-8")
+
 
 # Input fields for question and test type selection
 question_raw = st.chat_input("Enter your question:")
