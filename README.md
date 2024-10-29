@@ -1,2 +1,2 @@
-pip install pymupdf
+pip install PyMuPDF
 pip install streamlit
