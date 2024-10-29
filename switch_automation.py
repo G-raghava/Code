@@ -91,7 +91,7 @@ for chat in st.session_state.chat_history:
     with st.chat_message("assistant"):
         st.write(chat["assistant"])
         # Display source URLs if available
-        if chat["source_urls"]:
-            st.write("**Source URLs:**")
-            for url in chat["source_urls"]:
-                st.write(url)
+        #if chat["source_urls"]:
+            #st.write("**Source URLs:**")
+            #for url in chat["source_urls"]:
+                #st.write(url)
