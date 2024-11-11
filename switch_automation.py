@@ -3,15 +3,15 @@ import requests
 import json
 import re
 import fitz  # PyMuPDF
-from dotenv import load_dotenv
-import os
+#from dotenv import load_dotenv
+#import os
 
 # Load environment variables from .env file if running locally
-load_dotenv()
+#load_dotenv()
 
 # Get API URL and key from environment variables
-api_url = os.getenv("API_URL")
-api_key = os.getenv("API_KEY")
+#api_url = os.getenv("API_URL")
+#api_key = os.getenv("API_KEY")
 
 # Extract text from PDF file using fitz (PyMuPDF)
 def extract_text_from_pdf(pdf_file):
@@ -75,6 +75,10 @@ if 'chat_history' not in st.session_state:
 
 st.title("Chatbot for Switch Automation")
 st.write("Select the database, enter a question,  and get a response from the API.")
+
+
+api_url = "https://bfhirdl9h5.execute-api.us-west-2.amazonaws.com/dev/switchAutomation/"
+api_key = "9ZvOUXcI5494YBCOVBKcsa3LRZ9sT3ho466qJs7h" 
 
 # File upload option
 uploaded_file = st.file_uploader("Upload a file (optional)", type=["txt", "json", "py", "pdf"])
