@@ -13,6 +13,8 @@ import fitz  # PyMuPDF
 #api_url = os.getenv("API_URL")
 #api_key = os.getenv("API_KEY")
 
+st.set_page_config(layout="wide")
+
 # Extract text from PDF file using fitz (PyMuPDF)
 def extract_text_from_pdf(pdf_file):
     text = ""
@@ -32,42 +34,67 @@ def preprocess_question(question):
 
 # Function to access API
 def access_api(url, question, test_type, api_key, file_content=None):
-    payload = {
-        "question": question,
-        "test_type": test_type
-    }
-    if file_content:
-        payload["file_content"] = file_content 
-    
     headers = {
         'Content-Type': 'application/json',
         'x-api-key': api_key
     }
-    
-    try:
-        response = requests.post(url, headers=headers, json=payload)
-        if response.status_code == 200:
-            try:
+
+    # Prepare response structure for cases without files
+    answer = []
+    source_urls = ["** No Source URL **"]
+    session_id = 'No session ID found'
+    # If files are uploaded, iterate through each file
+    if file_content:
+        try:
+            for content in file_content:
+                payload = {
+                    "question": question,
+                    "test_type": test_type,
+                    "file_content": content
+                }
+                response = requests.post(url, headers=headers, json=payload)
+                if response.status_code == 200:
+                    body_json = response.json()
+                    if isinstance(body_json, str):
+                        body_content = json.loads(body_json)
+                    else:
+                        body_content = body_json
+                    answer.append(body_content.get('answer', 'No answer found'))
+                    source_urls = body_content.get('source_urls', ["** No Source URL **"])
+                    session_id = body_content.get('sessionId', 'No session ID found')
+                else:
+                    st.error(f"Error: API request failed with status code {response.status_code}")
+                    st.error(f"Response text: {response.text}")
+                    return None, None, None
+        except requests.exceptions.RequestException as e:
+            st.error(f"Error: {e}")
+            return None, None, None
+    else:
+        # If no files are uploaded, send a single request without file content
+        try:
+            payload = {
+                "question": question,
+                "test_type": test_type
+            }
+            response = requests.post(url, headers=headers, json=payload)
+            if response.status_code == 200:
                 body_json = response.json()
                 if isinstance(body_json, str):
                     body_content = json.loads(body_json)
                 else:
                     body_content = body_json
-                answer = body_content.get('answer', 'No answer found')
+                answer = [body_content.get('answer', 'No answer found')]
                 source_urls = body_content.get('source_urls', ["** No Source URL **"])
                 session_id = body_content.get('sessionId', 'No session ID found')
-                return answer, source_urls, session_id
-            except json.JSONDecodeError as e:
-                st.error(f"Error decoding JSON: {e}")
+            else:
+                st.error(f"Error: API request failed with status code {response.status_code}")
                 st.error(f"Response text: {response.text}")
-                return None, None
-        else:
-            st.error(f"Error: API request failed with status code {response.status_code}")
-            st.error(f"Response text: {response.text}")
-            return None, None
-    except requests.exceptions.RequestException as e:
-        st.error(f"Error: {e}")
-        return None, None
+                return None, None, None
+        except requests.exceptions.RequestException as e:
+            st.error(f"Error: {e}")
+            return None, None, None
+
+    return answer, source_urls, session_id
 
 # Initialize session state to store conversation history
 if 'chat_history' not in st.session_state:
@@ -113,7 +140,14 @@ for chat in st.session_state.chat_history:
     with st.chat_message("user"):
         st.write(chat["user"])
     with st.chat_message("assistant"):
-        st.write(chat["assistant"])
+        if len(file_names):
+            for i in range(len(chat["assistant"])):
+                st.markdown(f"📂 **File:** {file_names[i]}")
+                #Blue color
+                #st.markdown(f'<span style="color:#3498db; font-weight:bold;">📂 File: {file_names[i]}</span>', unsafe_allow_html=True)
+                st.code(chat["assistant"][i], language="python")
+        else:
+            st.write(chat["assistant"][0])
         # Display source URLs if available
         #if chat["source_urls"]:
             #st.write("**Source URLs:**")
