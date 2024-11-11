@@ -108,14 +108,20 @@ api_url = "https://bfhirdl9h5.execute-api.us-west-2.amazonaws.com/dev/switchAuto
 api_key = "9ZvOUXcI5494YBCOVBKcsa3LRZ9sT3ho466qJs7h" 
 
 # File upload option
-uploaded_file = st.file_uploader("Upload a file (optional)", type=["txt", "json", "py", "pdf"])
+uploaded_files = st.file_uploader("Upload files (optional)", type=["txt", "json", "py", "pdf"], accept_multiple_files=True)
 
-file_content = None
-if uploaded_file is not None:
-    if uploaded_file.type == "application/pdf":
-        file_content = extract_text_from_pdf(uploaded_file)  # Use fitz to extract text from PDF
-    else:
-        file_content = uploaded_file.read().decode("utf-8")
+file_content = []
+file_names = []
+for uploaded_file in uploaded_files:
+    if uploaded_file is not None:
+        if uploaded_file.type == "application/pdf":
+            single_file_content = extract_text_from_pdf(uploaded_file)
+            file_content.append(single_file_content)
+        else:
+            file_name = uploaded_file.name
+            file_names.append(file_name)
+            single_file_content = uploaded_file.read().decode("utf-8")
+            file_content.append(single_file_content)
 
 
 # Input fields for question and test type selection
@@ -128,8 +134,6 @@ test_type_choice = st.selectbox(
 
 
 if question_raw:
-    #with st.chat_message("user"):
-        #st.write(question_raw)
     question = preprocess_question(question_raw)
     answer, source_urls, session_id = access_api(api_url, question, test_type_choice, api_key, file_content)
     
