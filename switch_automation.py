@@ -144,12 +144,17 @@ for chat in st.session_state.chat_history:
     with st.chat_message("user"):
         st.write(chat["user"])
     with st.chat_message("assistant"):
-        if len(file_names):
-            for i in range(len(chat["assistant"])):
+        #if len(file_names):
+            #for i in range(len(chat["assistant"])):
+        if len(file_names) and len(chat["assistant"]):
+            for i in range(min(len(file_names), len(chat["assistant"]))):
                 st.markdown(f"📂 **File:** {file_names[i]}")
-                #Blue color
-                #st.markdown(f'<span style="color:#3498db; font-weight:bold;">📂 File: {file_names[i]}</span>', unsafe_allow_html=True)
-                st.code(chat["assistant"][i], language="python")
+                if i == 0:
+                    st.write(chat["assistant"])
+                else:
+                    #Blue color
+                    #st.markdown(f'<span style="color:#3498db; font-weight:bold;">📂 File: {file_names[i]}</span>', unsafe_allow_html=True)
+                    st.code(chat["assistant"][i], language="python")
         else:
             st.write(chat["assistant"][0])
         # Display source URLs if available
