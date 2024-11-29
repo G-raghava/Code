@@ -109,7 +109,29 @@ api_key = "9ZvOUXcI5494YBCOVBKcsa3LRZ9sT3ho466qJs7h"
 
 # File upload option
 uploaded_files = st.file_uploader("Upload files (optional)", type=["txt", "json", "py", "pdf"], accept_multiple_files=True)
-
+css = '''
+        <style>
+            [data-testid='stFileUploader'] {
+                width: max-content;
+            }
+            [data-testid='stFileUploader'] section {
+                padding: 0;
+                float: left;
+            }
+            [data-testid='stFileUploader'] section > input + div {
+                display: none;
+            }
+            [data-testid='stFileUploader'] section + div {
+                float: right;
+                padding-top: 0;
+            }
+            .stTextInput {
+                width: 100%;
+            }
+        </style>
+    '''
+ 
+st.markdown(css, unsafe_allow_html=True)
 file_content = []
 file_names = []
 for uploaded_file in uploaded_files:
